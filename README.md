@@ -1,0 +1,2 @@
+# BotDiscord
+Futur documentation
