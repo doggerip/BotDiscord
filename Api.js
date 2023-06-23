@@ -4,54 +4,131 @@ const apiKey = '2307dae448684d268ef134320232306';
 const location = 'Nantes';
 require('moment/locale/fr'); // Importer la locale française
 // Requête pour obtenir les informations météorologiques
-const forecastUrl = `http://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${location}&days=1&aqi=yes&alerts=yes`;
-
+const forecastUrl = `http://api.weatherapi.com/v1/forecast.json?key=${apiKey}&dt=2023-06-24&q=${location}&days=1&aqi=yes&alerts=yes`;
+http://api.weatherapi.com/v1/forecast.json?key={2307dae448684d268ef134320232306}&q={Nantes}&days=1&aqi=yes&alerts=yes
 fetch(forecastUrl)
   .then(response => response.json())
   .then(data => {
     // Extraire les informations nécessaires de la réponse JSON
-    const current = data.current;
-    const forecast = data.forecast.forecastday[0];
-
+    const forecast = data.forecast && data.forecast.forecastday && data.forecast.forecastday.length > 0 ? data.forecast.forecastday[0] : null;
+    console.log(forecast)
+    console.log("dateeee",data.location.localtime)
     // Alertes
     const alerts = data.alerts;
+  // Date de la météo
+  const laDate = moment(forecast.date).locale('fr').format('LLLL').toString();
+  // Température
+  const temperature = forecast.temp_c;
 
-    // Température
-    const temperature = current.temp_c;
+  // Température maximum
+  const temperatureMax = forecast.maxtemp_c;
 
-    // Vitesse du vent
-    const windSpeed = current.wind_kph;
+  // Température minimum
+  const temperatureMin = forecast.mintemp_c;
 
-    //Ressentie
-    const feelLike = current.feelslike_c;
+  // Moyenne de temperature
+  const temperatureMoy = forecast.avgtemp_c;
 
-    // Humidité
-    const humidity = current.humidity;
+  // Vitesse du vent
+  const windSpeed = forecast.maxwind_mph;
 
-    // Conditions météorologiques (ensoleillé, pluie, etc.)
-    const condition = current.condition.text;
+  //Visibilté moyenne en km
+  const visibilite = forecast.avgvis_km;
 
-    // Précipitations
-    const precipitation = current.precip_mm;
+  //Humidité moyenne 
+  const humidite = forecast.avghumidity;
+  const humiditeEmojis = {
+      "0": "💧",
+      "25": "💧💧",
+      "50": "💧💧💧",
+      "75": "💧💧💧💧",
+      "100": "💧💧💧💧💧"
+    };
+  const humiditeEmoji = humiditeEmojis[humidite];
 
-    // Pression barométrique
-    const pressure = current.pressure_mb;
+  //Précipitation pluie en mm
+  const precipitationPluie = forecast.totalprecip_mm;
 
-    // Tendance barométrique
-    const pressureTrend = current.pressure_trend;
+  //Précipitation neige en cm
+  const precipitationNeige = forecast.day.totalsnow_cm;
+  console.log(precipitationNeige)
+  //Risque de pluie
+  const risquedepluie = forecast.daily_chance_of_rain && forecast.daily_chance_of_rain == 0 ? "Non" : "Oui"
 
-    // Direction du vent
-    const windDirection = current.wind_dir;
+  //Risque de neige
+  const risquedeneige = forecast.day.daily_chance_of_snow && forecast.daily_chance_of_snow == 0 ? "Non" : "Oui"
+  console.log(risquedeneige)
 
-    // Qualité de l'air
-    const airQuality = current.air_quality;
-    const airQualityDescription = airQuality['us-epa-index'] <= 2 ? 'Bonne' : 'Mauvaise';
-    //lever du jour
-    const sunrise = moment(current.sunrise).locale('fr').format('LT');
+  //Conditions météorologiques (ensoleillé, pluie, etc.)
+  const condition = forecast.day.condition ;
+console.log(condition.text)
+  const conditionIcon = "http:"+forecast.day.condition.icon;
 
-    //Couché du soleil
-    const sunset = moment(current.sunset).locale('fr').format('LT');
+  //Indice UV
+  const indiceUV = forecast.uv;
+  let niveauUV;
 
+  switch (true) {
+      case indiceUV <= 2:
+          niveauUV = "Faible";
+          break;
+      case indiceUV <= 5:
+          niveauUV = "Modéré";
+          break;
+      case indiceUV <= 7:
+          niveauUV = "Élevé";
+          break;
+      case indiceUV <= 10:
+          niveauUV = "Très élevé";
+          break;
+      default:
+          niveauUV = "Extrême";
+          break;
+  }
+  //Phase de la lune
+  const moonPhase = forecast.moon_phase;
+  const moonPhaseEmojis = {
+      "New Moon": "🌑",
+      "First Quarter": "🌓",
+      "Full Moon": "🌕",
+      "Last Quarter": "🌗"
+    };
+  const moonPhaseEmoji = moonPhaseEmojis[moonPhase];
+
+  //Illumination de la lune
+  const moonIlluminationEmojis = {
+      "0": "🌑",
+      "10": "🌒",
+      "20": "🌓",
+      "30": "🌔",
+      "40": "🌕",
+      "50": "🌖",
+      "60": "🌗",
+      "70": "🌘",
+      "80": "🌑",
+      "90": "🌑",
+      "100": "🌑"
+    };
+    const moonIllumination = forecast.moon_illumination;
+    const moonIlluminationEmoji = moonIlluminationEmojis[moonIllumination];
+  // Pression barométrique
+  const pressure = forecast.pressure_mb;
+
+  // Direction du vent
+  const windDirection = forecast.wind_dir;
+
+  // Qualité de l'air
+  const airQuality = forecast.air_quality;
+  const airQualityDescription = airQuality['us-epa-index'] <= 2 ? 'Bonne' : 'Mauvaise';
+
+  // Lever du jour
+  const sunrise = moment(forecast.astro.sunrise, 'hh:mm A').locale('fr').format('LT'); 
+
+  // Couché du soleil
+  const sunset = moment(forecast.astro.sunset, 'hh:mm A').locale('fr').format('LT');
+
+
+    console.log("jour",data.forecast.forecastday)
     // Affichage des informations
     console.log('Alertes:', alerts);
     console.log('Température:', temperature,"°C");
@@ -68,6 +145,8 @@ fetch(forecastUrl)
     console.log('Qualité de l\'air:', airQualityDescription);
     console.log('Qualité de l\'air:', airQuality);
     
+
+
     // Données spécifiques de l'heure à venir
     const nextHour = forecast.hour[17];
 
@@ -83,6 +162,8 @@ fetch(forecastUrl)
     console.log('Probabilité de pluie :', nextHour.chance_of_rain, '%');
     console.log('Précipitations de neige :', nextHour.will_it_snow);
     console.log('Probabilité de neige :', nextHour.chance_of_snow, '%');
+
+
   })
   .catch(error => {
     console.log('Une erreur s\'est produite:', error);
