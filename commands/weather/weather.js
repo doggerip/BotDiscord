@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { getConditionEmoji } = require('../../assets/emojiConditions');
 const moment = require('moment');
 const today = moment(); 
-const { getConditionEmoji } = require('./emojiConditions');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -44,7 +44,6 @@ module.exports = {
         )
     ),
 
-
     async execute(interaction) {
         const { options } = interaction;
         const location = options.getString('localisation');
@@ -56,6 +55,8 @@ module.exports = {
         let forecastUrl = `http://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${location}&days=${jour}&aqi=yes&alerts=yes&lang=fr`;
         if (hour) {
             forecastUrl += `&hour=${hour}`;
+        }else {
+            forecastUrl += `&hour=12`;
         };
         if(jour) {
             forecastUrl +=`&dt=${dateFuture}`;
@@ -93,11 +94,30 @@ module.exports = {
             const pointderose = forecastHour.dewpoint_c
 
             //Risque de pluie en %
-            const precipitationPluie  = forecastHour.chance_of_rain;
+            let precipitationPluie;
+            switch (true) {
+              case (forecastHour.chance_of_rain <= 0):
+                precipitationPluie = 'Aucun risque de pluie';
+                break;
+              case (forecastHour.chance_of_rain <= 25):
+                precipitationPluie = forecastHour.chance_of_rain  + '% ☔';
+                break;
+              case (forecastHour.chance_of_rain <= 50):
+                precipitationPluie = forecastHour.chance_of_rain  + '% ☔☔';
+                break;
+              case (forecastHour.chance_of_rain <= 75):
+                precipitationPluie = forecastHour.chance_of_rain + '% ☔☔☔';
+                break;
+              case (forecastHour.chance_of_rain <= 100):
+                precipitationPluie = forecastHour.chance_of_rain + '% ☔☔☔☔';
+                break;
+            }
+
+
 
             //Risque de neige en %
             const precipitationNeige = forecastHour.chance_of_snow;
-
+           
             //Risque de pluie boolean
             const risquedepluie = forecastHour.will_it_rain === 0 ? "Non" : "Oui"
 
@@ -134,7 +154,6 @@ module.exports = {
                     break;
             }
 
-
             // Qualité de l'air      
             const airQuality = forecastHour.air_quality;
             const airQualityDescription = airQuality['us-epa-index'] <= 2 ? 'Bonne' : 'Mauvaise';
@@ -147,11 +166,12 @@ module.exports = {
                 airQualityEmoji = "🙂"; 
                 break;
             case 3:
-                airQualityEmoji = "😷"; // Mauvaise qualité de l'air
+                airQualityEmoji = "😷"; 
                 break;
             default:
-                airQualityEmoji = "❓"; // Valeur inconnue ou non définie
+                airQualityEmoji = "❓"; 
             }
+
             //Humidité moyenne 
             const humidite = forecastDay.avghumidity;
             const humiditeEmojis = {
@@ -169,7 +189,6 @@ module.exports = {
                     break;
                 }
             }
-
 
             //Phase de la lune
             const moonPhase = forecastAstro.moon_phase;
@@ -216,14 +235,9 @@ module.exports = {
             // Couché du soleil
             const sunset = moment(forecastAstro.sunset, 'hh:mm A').locale('fr').format('LT');
 
-
             //Alerte
             const alert = forecastAlert.alert && forecastAlert.alert.alert && forecastAlert.alert.alert.length > 0?   forecastAlert.alert.alert:"Aucune alerte"
             
-
-
-
-
             const embed = new EmbedBuilder()
                 .setColor('Blue')
                 .setTitle(`Météo de ${location} pour le ${laDate}`)
@@ -235,7 +249,7 @@ module.exports = {
                     { name: 'Rafales de vent', value: `${windRafale} km/h` },
                     { name: 'Visibilité', value: `${visibilite} km` },
                     { name: 'Point de rosée', value: `${pointderose} °C` },
-                    { name: 'Précipitations (pluie)', value: `${precipitationPluie}%` },
+                    { name: 'Précipitations (pluie)', value: `${precipitationPluie}` },
                     { name: 'Précipitations (neige)', value: `${precipitationNeige}%` },
                     { name: 'Risque de pluie', value: risquedepluie },
                     { name: 'Risque de neige', value: risquedeneige },
@@ -251,8 +265,9 @@ module.exports = {
                     { name: 'Alertes', value: `${alert}` }
                 );
                
-            interaction.editReply({ content: '', embeds: [embed] })
-
+           // interaction.editReply({ content: '', embeds: [embed] })
+        // Envoyez l'embed en tant que message privé à l'utilisateur
+        await interaction.user.send({ embeds: [embed] });
         } catch (error) {
             console.log(`Une erreur s'est produite`, error);
             interaction.editReply({ content: `Une erreur s'est produite bordel, encore un coup des Manceaux  .` });

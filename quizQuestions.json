@@ -1,0 +1,75 @@
+{
+  "questions": {
+    "Insolite": [
+      {
+        "question": "Quel est l'animal capable de vivre le plus longtemps sans eau ?",
+        "options": ["Chameau", "Kangourou", "Chien", "Cafard"],
+        "answerIndex": 3
+      },
+      {
+        "question": "Quelle est la vitesse de rotation de la Terre en km/h à l'équateur ?",
+        "options": ["167 km/h", "250 km/h", "360 km/h", "465 km/h"],
+        "answerIndex": 0
+      }
+    ],
+    "Developpement": [
+      {
+        "question": "Qu'est-ce que Java ?",
+        "options": [
+          "Un langage de programmation",
+          "Un framework de développement web",
+          "Un système d'exploitation",
+          "Un navigateur web"
+        ],
+        "answerIndex": 0
+      },
+      {
+        "question": "Qu'est-ce que PowerApps ?",
+        "options": [
+          "Une plateforme de développement d'applications mobiles",
+          "Un langage de programmation",
+          "Un système d'exploitation",
+          "Un framework de développement web"
+        ],
+        "answerIndex": 0
+      },
+      {
+        "question": "Qu'est-ce que TypeScript ?",
+        "options": [
+          "Un langage de programmation",
+          "Un système d'exploitation",
+          "Un framework de développement web",
+          "Une base de données"
+        ],
+        "answerIndex": 0
+      },
+      {
+        "question": "Qu'est-ce qu'Angular ?",
+        "options": [
+          "Un framework de développement web",
+          "Un langage de programmation",
+          "Un système d'exploitation",
+          "Un système de gestion de bases de données"
+        ],
+        "answerIndex": 0
+      },
+      {
+        "question": "Qu'est-ce que Spring ?",
+        "options": [
+          "Un framework de développement Java",
+          "Un langage de programmation",
+          "Un système d'exploitation",
+          "Un système de gestion de bases de données"
+        ],
+        "answerIndex": 0
+      }
+    ],
+    "Nourriture": [
+      {
+        "question": "Quelle est la pizza la plus populaire ?",
+        "options": ["Margherita", "Pepperoni", "Quattro Formaggi", "Hawaïenne"],
+        "answerIndex": 1
+      }
+    ]
+  }
+}
